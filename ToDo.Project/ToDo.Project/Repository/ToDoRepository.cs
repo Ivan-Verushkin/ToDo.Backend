@@ -16,5 +16,40 @@ namespace ToDo.Project.Repository
         {
             return await dbContext.toDoLists.ToListAsync();
         }
+
+        public async Task<List<ToDoList>> CreateToDo(ToDoList toDoList)
+        {
+            await dbContext.toDoLists.AddAsync(toDoList);
+            await dbContext.SaveChangesAsync();
+
+            return await dbContext.toDoLists.ToListAsync();
+        }
+
+        public async Task<List<ToDoList>> UpdateToDo(ToDoList toDoList)
+        {
+            var updatedToDoList = await dbContext.toDoLists.FirstOrDefaultAsync(x => x.Id == toDoList.Id);
+
+            if (updatedToDoList == null)
+            {
+                return null;
+            }
+
+            updatedToDoList.ToDo = toDoList.ToDo;
+
+            await dbContext.SaveChangesAsync();
+            return await dbContext.toDoLists.ToListAsync();
+        }
+        public async Task<List<ToDoList>> DeleteToDo(int id)
+        {
+            var deletedToDoList = await dbContext.toDoLists.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(deletedToDoList == null)
+            {
+                return null;
+            }
+            dbContext.toDoLists.Remove(deletedToDoList);
+            await dbContext.SaveChangesAsync();
+            return await dbContext.toDoLists.ToListAsync();
+        }
     }
 }
