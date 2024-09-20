@@ -23,13 +23,16 @@ namespace ToDo.Project.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<ToDoList>>> AddToDoList([FromBody] string toDoList)
+        public async Task<ActionResult<List<ToDoList>>> AddToDoList([FromBody] ToDoList toDoList)
         {
+            if (string.IsNullOrEmpty(toDoList.ToDo))
+            {
+                return BadRequest("ToDo item cannot be empty.");
+            }
+
             try
             {
-                var newToDoList = new ToDoList() { ToDo = toDoList };
-
-                var toDoLists = await toDoRepository.CreateToDo(newToDoList);
+                var toDoLists = await toDoRepository.CreateToDo(toDoList);
 
                 return toDoLists.ToList();
             }
@@ -39,11 +42,13 @@ namespace ToDo.Project.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<ActionResult<List<ToDoList>>> UpdateToDoList([FromBody] ToDoList toDoList)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<List<ToDoList>>> UpdateToDoList([FromRoute] int id, [FromBody] ToDoList toDoList)
         {
             try
             {
+                // Ensure the ID from the route is used
+                toDoList.Id = id;
                 var updatedToDoList = await toDoRepository.UpdateToDo(toDoList);
 
                 if (updatedToDoList == null)
